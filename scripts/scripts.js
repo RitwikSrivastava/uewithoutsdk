@@ -1,6 +1,7 @@
 import {
   loadHeader,
   loadFooter,
+  createOptimizedPicture,
   decorateIcons,
   decorateSections,
   decorateBlocks,
@@ -157,6 +158,38 @@ export function moveAttributes(from, to, attributes) {
   });
 }
 
+function isDMOpenAPIUrl(href) {
+  return /^(https?:\/\/(.*)\/adobe\/assets\/urn:aaid:aem:(.*))/gm.test(href);
+}
+
+function isScene7Url(href) {
+  return /^(https?:\/\/(.*\.)?scene7\.com\/is\/image\/(.*))/i.test(href);
+}
+
+/**
+ * Replace standalone DM / Scene7 image links in default content with img / picture.
+ * DM Open API links use createOptimizedPicture (same URL pattern as aem-boilerplate).
+ * @param {Element} main
+ */
+export function decorateExternalImages(main) {
+  main.querySelectorAll('a[href]').forEach((a) => {
+    if (isScene7Url(a.href)) {
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      img.src = a.href;
+      if (a.href !== a.innerText) {
+        img.setAttribute('alt', a.innerText);
+      }
+      a.replaceWith(img);
+    } else if (isDMOpenAPIUrl(a.href)) {
+      const altText = a.textContent?.trim() || '';
+      const alt = a.href !== altText ? altText : '';
+      const pic = createOptimizedPicture(a.href, alt, false);
+      a.replaceWith(pic);
+    }
+  });
+}
+
 export function decorateImages(main) {
   main.querySelectorAll('p img').forEach((img) => {
     const p = img.closest('p');
@@ -223,6 +256,7 @@ export function decorateMain(main) {
   // hopefully forward compatible button decoration
   // decorateButtons(main); // Commented out - blocks handle their own button styling
   decorateIcons(main);
+  decorateExternalImages(main);
   buildAutoBlocks(main);
   decorateSections(main);
   decorateBlocks(main);
