@@ -1,10 +1,10 @@
 {
   "mappings": [
-    "/content/newritsriva-ue/:/",
-    "/content/newritsriva-ue/configuration:/.helix/config.json",
-    "/content/newritsriva-ue/metadata:/metadata.json"
+    "/content/uewithoutsdk/:/",
+    "/content/uewithoutsdk/configuration:/.helix/config.json",
+    "/content/uewithoutsdk/metadata:/metadata.json"
   ],
   "includes": [
-    "/content/newritsriva-ue/"
+    "/content/uewithoutsdk/"
   ]
 }
