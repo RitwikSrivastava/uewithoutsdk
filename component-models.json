@@ -335,7 +335,7 @@
     ]
   },
   {
-    "id": "image-and-text-item",
+    "id": "image-and-text-container",
     "fields": [
       {
         "component": "select",
@@ -401,7 +401,7 @@
     ]
   },
   {
-    "id": "image-and-text-container",
+    "id": "image-and-text-item",
     "fields": [
       {
         "component": "custom-asset-namespace:custom-asset",
