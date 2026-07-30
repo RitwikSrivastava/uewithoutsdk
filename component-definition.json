@@ -171,6 +171,36 @@
               }
             }
           }
+        },
+        {
+          "title": "Image and Text Container",
+          "id": "image-and-text-container",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Image and Text Container",
+                  "filter": "image-and-text-container"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Image and Text Item",
+          "id": "image-and-text-item",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Image and Text Item",
+                  "model": "image-and-text-item"
+                }
+              }
+            }
+          }
         }
       ]
     }

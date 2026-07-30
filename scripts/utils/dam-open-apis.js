@@ -163,8 +163,23 @@ export const createDMImageUrl = (repositoryId, assetId) => {
   return '';
 };
 
+// Builds an <img> from a custom-asset field row. Fields with a paired `imageMimeType`
+// model field (e.g. dm-image) render as a native <img>; fields without one (e.g. hero,
+// image-and-text-item) render as an <a href> instead, so both shapes need to be read here.
+function getImageFromRow(row) {
+  const existingImg = row.querySelector('img');
+  if (existingImg) return existingImg.cloneNode(true);
+
+  const anchor = row.querySelector('a[href]');
+  if (!anchor) return null;
+  const img = document.createElement('img');
+  img.src = anchor.href;
+  img.alt = anchor.getAttribute('title') || anchor.textContent?.trim() || '';
+  return img;
+}
+
 export default function decorateDynamicMediaImage(image, options = {}) {
-  const img = image ? image.querySelector('img')?.cloneNode(true) : null;
+  const img = image ? getImageFromRow(image) : null;
   if (!img || !img.src) return '';
 
   const { smartCrops, excludeAltText, eager } = options;
