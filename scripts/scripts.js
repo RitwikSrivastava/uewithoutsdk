@@ -1,7 +1,6 @@
 import {
   loadHeader,
   loadFooter,
-  createOptimizedPicture,
   decorateIcons,
   decorateSections,
   decorateBlocks,
@@ -11,6 +10,7 @@ import {
   loadSections,
   loadCSS,
 } from './aem.js';
+import assetsInit from './aem-assets-plugin-support.js';
 
 const CONTENT_ROOT_PATH = '/content/Gazal-ue-site';
 
@@ -158,17 +158,17 @@ export function moveAttributes(from, to, attributes) {
   });
 }
 
-function isDMOpenAPIUrl(href) {
-  return /^(https?:\/\/(.*)\/adobe\/assets\/urn:aaid:aem:(.*))/gm.test(href);
-}
-
 function isScene7Url(href) {
   return /^(https?:\/\/(.*\.)?scene7\.com\/is\/image\/(.*))/i.test(href);
 }
 
 /**
  * Replace standalone DM / Scene7 image links in default content with img / picture.
- * DM Open API links use createOptimizedPicture (same URL pattern as aem-boilerplate).
+ * Scene7 links are swapped for a plain <img>. DM Open API links are handed off to
+ * aem-assets-plugin's decorateExternalImages (see scripts/aem-assets-plugin-support.js),
+ * which also sets width/height from the originalImageWidth/originalImageHeight query
+ * params the asset picker attaches, preventing CLS - see
+ * https://github.com/adobe-rnd/aem-assets-plugin/pull/31.
  * @param {Element} main
  */
 export function decorateExternalImages(main) {
@@ -181,13 +181,12 @@ export function decorateExternalImages(main) {
         img.setAttribute('alt', a.innerText);
       }
       a.replaceWith(img);
-    } else if (isDMOpenAPIUrl(a.href)) {
-      const altText = a.textContent?.trim() || '';
-      const alt = a.href !== altText ? altText : '';
-      const pic = createOptimizedPicture(a.href, alt, false);
-      a.replaceWith(pic);
     }
   });
+
+  if (window.hlx.aemassets?.decorateExternalImages) {
+    window.hlx.aemassets.decorateExternalImages(main);
+  }
 }
 
 export function decorateImages(main) {
@@ -347,4 +346,5 @@ if (!window.eds_config) {
   };
 }
 
+await assetsInit();
 loadPage();
