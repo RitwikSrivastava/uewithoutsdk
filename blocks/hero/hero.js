@@ -5,17 +5,10 @@ import {
   isRenderableElement,
   getTextContent,
   isFieldTrue,
+  getDecoratedPicture,
+  clearAltIfHidden,
 } from '../../scripts/utils/dom.js';
 import { attachTestId } from '../../scripts/utils/common-utils.js';
-import decorateDynamicMediaImage from '../../scripts/utils/dam-open-apis.js';
-
-// Smart crop presets for responsive images
-
-const SMART_CROPS = {
-  sm: { crop: 'generic-3x2' },
-  md: { crop: 'generic-2x1' },
-  lg: { crop: 'generic-16x5', layout: 'hero' },
-};
 
 export default function decorate(block) {
   const [
@@ -28,13 +21,14 @@ export default function decorate(block) {
     excludeLogoAltText,
   ] = [...block.children];
 
-  const heroImage = decorateDynamicMediaImage(heroImageEl, {
-    smartCrops: SMART_CROPS,
-    excludeAltText: isFieldTrue(excludeHeroAltText),
-  });
-  const logoImage = decorateDynamicMediaImage(logoImageEl, {
-    excludeAltText: isFieldTrue(excludeLogoAltText),
-  });
+  // heroImageEl/logoImageEl already contain a <picture> built by aem-assets-plugin's
+  // decorateExternalImages (see scripts/scripts.js), which runs on the whole page before
+  // this block decorates - responsive AVIF/WebP sources sized from the asset's own
+  // intrinsic width/height, not a fixed crop.
+  const heroImage = getDecoratedPicture(heroImageEl);
+  clearAltIfHidden(heroImage, isFieldTrue(excludeHeroAltText));
+  const logoImage = getDecoratedPicture(logoImageEl);
+  clearAltIfHidden(logoImage, isFieldTrue(excludeLogoAltText));
 
   // Step 2: Promote child nodes and extract meaningful elements
   const title = promoteFirstChildIfExists(heroTitleEl)?.querySelector('h1');

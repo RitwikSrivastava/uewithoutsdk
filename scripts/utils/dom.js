@@ -47,6 +47,27 @@ const getTextContent = (node) => node?.textContent?.trim?.() || '';
 const isFieldTrue = (node) => node?.textContent?.trim?.() === 'true';
 
 /**
+ * Returns the <picture> or <img> that aem-assets-plugin's decorateExternalImages already
+ * built for this custom-asset field row - it runs on the whole page in decorateMain, before
+ * any block's own decorate() executes, so the raw <a href> authored by the field is already
+ * gone by the time block JS sees it.
+ * @param {Element|null} fieldEl
+ * @returns {Element|null}
+ */
+const getDecoratedPicture = (fieldEl) => fieldEl?.querySelector('picture, img') ?? null;
+
+/**
+ * Clears alt text on an already-decorated picture/img when a block's own "hide alt" field is set.
+ * @param {Element|null} picture
+ * @param {boolean} hidden
+ */
+const clearAltIfHidden = (picture, hidden) => {
+  if (!picture || !hidden) return;
+  const img = picture.tagName === 'IMG' ? picture : picture.querySelector('img');
+  img?.setAttribute('alt', '');
+};
+
+/**
  * Responsiveness should be handled in CSS
  * Use this function only for things that cannot be done in CSS such as eventListeners
  * and avoid window size listener at all times.
@@ -105,6 +126,8 @@ const isSvg = (input) => {
 export {
   isFieldTrue,
   getTextContent,
+  getDecoratedPicture,
+  clearAltIfHidden,
   promoteFirstChildIfExists,
   createElementWithClasses,
   isRenderableElement,

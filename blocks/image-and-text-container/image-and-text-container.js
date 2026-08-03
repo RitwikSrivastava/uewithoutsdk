@@ -3,8 +3,9 @@ import {
   getTextContent,
   createElementWithClasses,
   isFieldTrue,
+  getDecoratedPicture,
+  clearAltIfHidden,
 } from '../../scripts/utils/dom.js';
-import decorateDynamicMediaImage from '../../scripts/utils/dam-open-apis.js';
 import { EVENT_NAME, triggerBlockCardClick } from '../../scripts/martech/datalayer.js';
 import {
   attachTestId,
@@ -96,7 +97,7 @@ function attachTestIdToElements(block) {
 /*
  * Decorate Image and Text Item
  */
-function decorateItem(parentBlock, block, layoutClass, classes = []) {
+function decorateItem(parentBlock, block, classes = []) {
   const [
     image,
     hideAltText,
@@ -110,19 +111,21 @@ function decorateItem(parentBlock, block, layoutClass, classes = []) {
     campaignCode,
   ] = block.children;
 
-  const smartCrops = classes.includes('highlighted')
-    ? { all: { crop: 'generic-4x5', layout: layoutClass } }
-    : { all: { crop: 'generic-3x2', layout: layoutClass } };
-
+  // image already contains a <picture> built by aem-assets-plugin's decorateExternalImages
+  // (see scripts/scripts.js), which runs on the whole page before this block decorates.
   const highlighted = classes.includes('highlighted');
-  const pictureEl = decorateDynamicMediaImage(image, {
-    smartCrops,
-    excludeAltText: isFieldTrue(hideAltText),
-    eager: highlighted,
-  });
+  const pictureEl = getDecoratedPicture(image);
+  clearAltIfHidden(pictureEl, isFieldTrue(hideAltText));
+  if (highlighted) {
+    const img = pictureEl?.tagName === 'IMG' ? pictureEl : pictureEl?.querySelector('img');
+    if (img) {
+      img.loading = 'eager';
+      img.fetchPriority = 'high';
+    }
+  }
   let dmImgMarkup = '';
   if (pictureEl) {
-    dmImgMarkup = typeof pictureEl === 'string' ? pictureEl : pictureEl.outerHTML;
+    dmImgMarkup = pictureEl.outerHTML;
   }
 
   // Apply extra classes to text elements
@@ -235,7 +238,6 @@ export default function decorateContainer(block) {
 
   const imageAndTextItems = [];
   let numOfColumns = 1;
-  let layoutClass = null;
 
   // Get styles from single row items
   [...block.children].forEach((containerItem) => {
@@ -249,7 +251,6 @@ export default function decorateContainer(block) {
         // Get the selected column option to check if it's stacked
         const layoutStyleMatch = textContent.match(/^layout-([0-9])-col$/);
         if (layoutStyleMatch) {
-          layoutClass = textContent;
           numOfColumns = parseInt(layoutStyleMatch[1], 10);
         }
       }
@@ -275,7 +276,7 @@ export default function decorateContainer(block) {
       blockStyles,
     );
 
-    return decorateItem(block, imageAndTextItem, layoutClass, classes);
+    return decorateItem(block, imageAndTextItem, classes);
   });
 
   imageTextWrapper.append(...listItems);
