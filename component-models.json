@@ -401,7 +401,7 @@
     ]
   },
   {
-    "id": "image-and-text-item",
+    "id": "image-and-text",
     "fields": [
       {
         "component": "custom-asset-namespace:custom-asset",
