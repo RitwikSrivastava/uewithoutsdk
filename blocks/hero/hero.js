@@ -27,6 +27,16 @@ export default function decorate(block) {
   // intrinsic width/height, not a fixed crop.
   const heroImage = getDecoratedPicture(heroImageEl);
   clearAltIfHidden(heroImage, isFieldTrue(excludeHeroAltText));
+
+  // The hero image is almost always the LCP candidate, so override the plugin's default
+  // loading="lazy" - lazy-loading it would delay LCP for no benefit (it's always visible
+  // on load).
+  const heroImg = heroImage?.tagName === 'IMG' ? heroImage : heroImage?.querySelector('img');
+  if (heroImg) {
+    heroImg.loading = 'eager';
+    heroImg.fetchPriority = 'high';
+  }
+
   const logoImage = getDecoratedPicture(logoImageEl);
   clearAltIfHidden(logoImage, isFieldTrue(excludeLogoAltText));
 
