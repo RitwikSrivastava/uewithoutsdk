@@ -52,7 +52,8 @@
         "columns",
         "fragment",
         "dm-image",
-        "image-and-text-container"
+        "image-and-text-container",
+        "herorename"
       ]
     }
   ]

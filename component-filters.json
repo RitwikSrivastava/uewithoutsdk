@@ -17,7 +17,8 @@
       "columns",
       "fragment",
       "dm-image",
-      "image-and-text-container"
+      "image-and-text-container",
+      "herorename"
     ]
   },
   {
@@ -45,14 +46,6 @@
     "id": "image-and-text-container",
     "components": [
       "image-and-text-item"
-    ]
-  },
-  {
-    "id": "section",
-    "components": [
-      "text",
-      "image",
-      "button"
     ]
   }
 ]

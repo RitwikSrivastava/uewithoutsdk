@@ -1,0 +1,40 @@
+{
+    "repoNames": [
+      "delivery-p166604-e1781313.adobeaemcloud.com",
+      "author-p166604-e1781313.adobeaemcloud.com"
+    ],
+    "aemTierType": [
+        "delivery",
+        "author"
+    ],
+    "assetDomainMapping": {
+      "delivery-p166604-e1781313.adobeaemcloud.com": "./"
+    },
+    "vanityMapping": {
+      "adobe/assets": "customp/assets"
+    },
+    "expiryOptions": {
+        "allowSelectionAndDrag": false
+    },
+    "filterSchema": [
+      {
+        "fields": [
+          {
+            "defaultValue": ["dam:assetStatus==approved"],
+            "element": "radiogroup",
+            "name": "property",
+            "options": [
+              {
+                "label": "Approved",
+                "value": "dam:assetStatus==approved"
+              }
+            ],
+            "readOnly": true
+          }
+        ],
+        "groupKey": "StatusGroup",
+        "header": "Approval Status"
+      }
+      ]
+
+}
