@@ -23,8 +23,12 @@ export default async function assetsInit() {
       Large: { minWidth: 1024, maxWidth: 9999 },
     },
     // Matches this project's DM tenant, see config.json's repoNames/delivery domain.
+    // Also register any custom domain from the asset picker's assetDomainMapping config
+    // (tools/asset-selector/*.config.json) - a delivery URL rewritten to a custom domain
+    // still needs its own entry here to be picked up as an external DM image at all.
     externalImageUrlPrefixes: [
       ['https://delivery-p66302-e574366.adobeaemcloud.com/', createOptimizedPictureForDMOpenAPI],
+      ['https://dmwoa-delivery.scene7.com/', createOptimizedPictureForDMOpenAPI],
     ],
   };
 }
