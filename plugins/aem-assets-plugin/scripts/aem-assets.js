@@ -505,11 +505,7 @@ export function createOptimizedPictureForDMOpenAPI(
  * @private
  */
 function isDMOpenAPIUrl(src) {
-  // The path segment before urn:aaid:aem: is normally "adobe/assets", but a project's
-  // asset-domain/vanity-path mapping config can rewrite it to any custom path (or even a
-  // custom domain) - urn:aaid:aem: itself is the unambiguous, non-rewritable marker of an
-  // AEM asset delivery URL, so match on that alone rather than the swappable path prefix.
-  return /^https?:\/\/[^/]+\/.*urn:aaid:aem:/.test(src);
+  return /^(https?:\/\/[^/]+\/(?:.*\/)?assets\/urn:(?:aaid|avid):aem:(.*))/gm.test(src);
 }
 
 /**
