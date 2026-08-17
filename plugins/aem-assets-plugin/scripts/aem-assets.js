@@ -1,12 +1,16 @@
 /**
  * TEMPORARY VENDORED COPY - not a real `git subtree` checkout.
  *
- * Source: https://github.com/adobe-rnd/aem-assets-plugin, branch `anchorcls`
- * (https://github.com/adobe-rnd/aem-assets-plugin/pull/31), commit 902e2d2.
- * That branch isn't merged to `main` yet, so it can't be pulled in via the
- * plugin's normal `git subtree add --prefix plugins/aem-assets-plugin` flow.
+ * Source: https://github.com/adobe-rnd/aem-assets-plugin, branch
+ * `combined-dm-vanity-anchor-alt`, commit 9c2930e. That branch combines three
+ * not-yet-merged-to-main changes: anchorcls (PR #31, commit 902e2d2, anchor
+ * srcset with intrinsic width/height), PR #30 (commit 3ede27a, alt text
+ * fallback to link text), and dmwoa-url-vanity-support (commit a00304b, DMwOA
+ * urls with a custom vanity path/id). None of these are merged to `main` yet,
+ * so this can't be pulled in via the plugin's normal
+ * `git subtree add --prefix plugins/aem-assets-plugin` flow.
  *
- * Once PR #31 merges to `main`, delete this folder and re-add the plugin
+ * Once these merge to `main`, delete this folder and re-add the plugin
  * properly with `git subtree add --squash --prefix plugins/aem-assets-plugin
  * git@github.com:adobe-rnd/aem-assets-plugin.git main` (see the plugin's
  * README) so this stops drifting from upstream.
@@ -73,7 +77,7 @@ function isImageUrl(url) {
 function supportsSmartCrop(url) {
   if (!url) return false;
   const ext = getUrlExtension(url).toLowerCase();
-
+  
   // Smart crops work for raster images but not for excluded vector formats
   return !SMART_CROP_EXCLUDED_FORMATS.includes(ext) && IMAGE_FORMATS.includes(ext);
 }
@@ -120,7 +124,12 @@ function createWebOptimizedDMOpenAPIUrl(url) {
  */
 function getImageSrcUrlAndAlt(element) {
   if (element.tagName === 'A') {
-    return { url: element.getAttribute('href'), alt: element.getAttribute('title') || '' };
+    const href = element.getAttribute('href');
+    const text = element.textContent?.trim() || '';
+    // Fall back to the link's own text as alt text, unless it's just the raw URL
+    // (e.g. a pasted link with no author-supplied text), since that's not usable alt text.
+    const textAlt = text && text !== href ? text : '';
+    return { url: href, alt: element.getAttribute('title') || textAlt };
   }
 
   if (element.tagName === 'IMG') {
@@ -300,7 +309,7 @@ export function createOptimizedPictureWithSmartcrop(
   breakpoints = [],
 ) {
   const isAbsoluteUrl = /^https?:\/\//i.test(src);
-  // check if the image type supports smart cropping
+ // check if the image type supports smart cropping
   const canUseSmartCrop = supportsSmartCrop(src);
   // initialise breakpoint to project level smartcrop config unless needed to customise
   let smartcropBreakpoints = breakpoints;
@@ -686,6 +695,8 @@ export async function loadBlock(block) {
 // Create an object with the test functions
 const testFunctions = {
   appendQueryParams,
+  getImageSrcUrlAndAlt,
+  isDMOpenAPIUrl,
 };
 
 // Export the object
